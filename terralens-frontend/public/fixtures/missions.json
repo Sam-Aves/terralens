@@ -1,0 +1,41 @@
+[
+  {
+    "id": "mission_01_jamuna",
+    "missionNumber": "01",
+    "name": "The Changing Jamuna River",
+    "locationName": "Jamuna River, Bangladesh",
+    "coordinates": [89.70, 24.50],
+    "zoom": 10,
+    "requiredXpToUnlock": 0,
+    "preFloodDate": "2024-05-15",
+    "postFloodDate": "2024-07-12",
+    "estimatedAreaKm2": 12.5,
+    "story": "Sentinel-1 C-band SAR captured this braided river system before and during peak monsoon. Your task: identify the inundation extent using radar backscatter signatures."
+  },
+  {
+    "id": "mission_02_assam",
+    "missionNumber": "02",
+    "name": "Brahmaputra Flood Surge",
+    "locationName": "Assam, India (Brahmaputra Basin)",
+    "coordinates": [92.93, 26.20],
+    "zoom": 9,
+    "requiredXpToUnlock": 100,
+    "preFloodDate": "2024-06-01",
+    "postFloodDate": "2024-07-08",
+    "estimatedAreaKm2": 24.8,
+    "story": "Torrential monsoon rains upstream overwhelmed the Brahmaputra River in Assam. Cloud cover is 100% overcast. Use NISAR L-band SAR to penetrate clouds and map surge zones."
+  },
+  {
+    "id": "mission_03_amazon",
+    "missionNumber": "03",
+    "name": "Amazon Wetland Dynamics",
+    "locationName": "Manaus, Brazil (Amazon Basin)",
+    "coordinates": [-60.02, -3.12],
+    "zoom": 8,
+    "requiredXpToUnlock": 250,
+    "preFloodDate": "2024-03-10",
+    "postFloodDate": "2024-06-22",
+    "estimatedAreaKm2": 45.0,
+    "story": "Seasonal flood pulses submerge thousands of square kilometers of dense rainforest. NISAR S-band radar penetrates canopy to map sub-canopy inundation."
+  }
+]

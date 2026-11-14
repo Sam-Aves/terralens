@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TERRALENS // Screen 03 — The Radar Lab (Jamuna River, Bangladesh)</title>
+  
+  <!-- MapLibre GL CSS and JS -->
+  <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: #060913;
+      color: #f1f5f9;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      overflow: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navbar */
+    header {
+      height: 56px;
+      background: rgba(11, 17, 32, 0.96);
+      border-bottom: 1px solid rgba(0, 240, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 50;
+      flex-shrink: 0;
+    }
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .btn-return-game {
+      background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(14, 165, 233, 0.3));
+      border: 1px solid #00F0FF;
+      color: #00F0FF;
+      font-family: monospace;
+      font-weight: 700;
+      font-size: 11.5px;
+      padding: 7px 14px;
+      border-radius: 7px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.2s;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+    }
+    .btn-return-game:hover {
+      background: #00F0FF;
+      color: #060913;
+      box-shadow: 0 0 18px rgba(0, 240, 255, 0.5);
+      transform: translateY(-1px);
+    }
+    .brand-title {
+      font-family: monospace;
+      font-weight: 800;
+      font-size: 13.5px;
+      color: #00F0FF;
+      letter-spacing: 1.2px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .pulse-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #00F0FF;
+      box-shadow: 0 0 10px #00F0FF;
+      animation: pulse 1.6s infinite ease-in-out;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.4; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.2); }
+    }
+    .meta-tag {
+      font-size: 11px;
+      font-family: monospace;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      color: #cbd5e1;
+    }
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .xp-pill {
+      font-size: 11.5px;
+      font-family: monospace;
+      font-weight: bold;
+      color: #fbbf24;
+      background: rgba(251, 191, 36, 0.12);
+      border: 1px solid rgba(251, 191, 36, 0.4);
+      padding: 5px 12px;
+      border-radius: 6px;
+    }
+
+    /* Workspace */
+    .workspace {
+      display: flex;
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Map Stage (Matching React RadarMap.tsx) */
+    .map-stage {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      padding: 14px 14px 14px 14px;
+      gap: 10px;
+    }
+    
+    .map-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 4px;
+    }
+    .coord-label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: #94a3b8;
+      font-family: monospace;
+    }
+    .layer-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .layer-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #334155;
+      background: rgba(30, 41, 59, 0.6);
+      color: #94a3b8;
+      transition: all 0.15s;
+    }
+    .layer-btn.active-flood {
+      background: rgba(0, 240, 255, 0.2);
+      color: #00F0FF;
+      border-color: rgba(0, 240, 255, 0.5);
+    }
+    .layer-btn.active-impact {
+      background: rgba(249, 115, 22, 0.2);
+      color: #f97316;
+      border-color: rgba(249, 115, 22, 0.5);
+    }
+    .est-pill {
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      color: #00F0FF;
+      font-weight: 600;
+      font-family: monospace;
+    }
+
+    /* Map Box Container */
+    .map-wrapper {
+      flex: 1;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #334155;
+    }
+    #map-container {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+    }
+
+    /* Attribution Chip */
+    .attribution-chip {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(6, 9, 19, 0.85);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      border-radius: 4px;
+      padding: 4px 10px;
+      font-size: 10px;
+      font-family: monospace;
+      color: #00F0FF;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* SAR Legend (Exact Match to RadarMap.tsx) */
+    .sar-legend {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      background: rgba(6, 9, 19, 0.92);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 11px;
+      font-family: monospace;
+      color: #94a3b8;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      z-index: 10;
+      pointer-events: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+    }
+    .legend-title {
+      color: #00F0FF;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .swatch-flood {
+      width: 14px;
+      height: 10px;
+      background: rgba(0, 240, 255, 0.5);
+      border: 1.5px solid #00F0FF;
+      border-radius: 2px;
+    }
+    .swatch-comm {
+      width: 12px;
+      height: 12px;
+      background: #f97316;
+      border: 2px solid white;
+      border-radius: 50%;
+    }
+    .swatch-sat {
+      width: 14px;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1.5px solid #94a3b8;
+      border-radius: 2px;
+    }
+
+    /* Earth's Timeline Bar (Matching React App) */
+    .timeline-bar {
+      padding: 10px 16px;
+      border-radius: 10px;
+      background: rgba(11, 17, 32, 0.95);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      box-shadow: 0 4px 20px rgba(0, 240, 255, 0.1);
+    }
+    .timeline-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #00F0FF;
+      font-size: 11px;
+      font-family: monospace;
+      font-weight: 700;
+    }
+    .timeline-buttons {
+      flex: 1;
+      display: flex;
+      gap: 8px;
+    }
+    .timeline-btn {
+      flex: 1;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      background: rgba(30, 41, 59, 0.4);
+      color: #94a3b8;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s;
+    }
+    .timeline-btn:hover {
+      border-color: #64748b;
+      color: #f1f5f9;
+    }
+    .timeline-btn.active {
+      border-color: #00F0FF;
+      background: rgba(0, 240, 255, 0.2);
+      color: #00F0FF;
+    }
+    .timeline-btn .t-date {
+      font-size: 10px;
+      font-family: monospace;
+    }
+    .timeline-btn .t-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #f8fafc;
+      margin-top: 2px;
+    }
+    .timeline-status {
+      font-size: 11px;
+      color: #94a3b8;
+      text-align: right;
+      min-width: 160px;
+    }
+
+    /* Sidebar Challenges Panel */
+    aside {
+      width: 390px;
+      background: rgba(11, 17, 32, 0.98);
+      border-left: 1px solid rgba(51, 65, 85, 0.7);
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      overflow-y: auto;
+      z-index: 40;
+    }
+    .aside-header {
+      border-bottom: 1px solid rgba(51, 65, 85, 0.6);
+      padding-bottom: 12px;
+    }
+    .section-tag {
+      font-size: 10.5px;
+      font-family: monospace;
+      color: #00F0FF;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .mission-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 4px 0 8px 0;
+    }
+    .mission-story {
+      font-size: 12px;
+      color: #cbd5e1;
+      line-height: 1.55;
+    }
+
+    /* Science Sensor Badge */
+    .spec-card {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(51, 65, 85, 0.6);
+      border-radius: 9px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .spec-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+    }
+    .spec-label { color: #64748b; font-family: monospace; }
+    .spec-val { color: #cbd5e1; font-family: monospace; font-weight: 600; }
+    .spec-val.highlight { color: #00F0FF; }
+
+    /* Challenge Questions Card */
+    .challenge-card {
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(0, 240, 255, 0.35);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .question-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      font-family: monospace;
+    }
+    .question-text {
+      font-size: 13px;
+      color: #ffffff;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+    .options-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .option-btn {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px solid rgba(71, 85, 105, 0.6);
+      color: #cbd5e1;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      text-align: left;
+      cursor: pointer;
+      transition: all 0.15s;
+      line-height: 1.4;
+    }
+    .option-btn:hover:not(:disabled) {
+      background: rgba(0, 240, 255, 0.12);
+      border-color: #00F0FF;
+      color: #ffffff;
+    }
+    .option-btn.correct {
+      background: rgba(16, 185, 129, 0.2) !important;
+      border-color: #10b981 !important;
+      color: #6ee7b7 !important;
+    }
+    .option-btn.wrong {
+      background: rgba(239, 68, 68, 0.2) !important;
+      border-color: #ef4444 !important;
+      color: #fca5a5 !important;
+    }
+    .explanation-box {
+      background: rgba(11, 17, 32, 0.9);
+      border-left: 3px solid #00F0FF;
+      padding: 10px 12px;
+      border-radius: 4px;
+      font-size: 11.5px;
+      line-height: 1.5;
+      color: #94a3b8;
+    }
+    .explanation-box strong { color: #00F0FF; }
+    .btn-action {
+      background: #00F0FF;
+      color: #060913;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 12.5px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+    .btn-action:hover {
+      background: #38bdf8;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.4);
+    }
+
+    /* Debrief Modal */
+    .completion-banner {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.6);
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .completion-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #34d399;
+      letter-spacing: 0.5px;
+    }
+
+    /* Return Overlay Notification */
+    #return-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 9, 19, 0.95);
+      z-index: 100;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+      text-align: center;
+      padding: 30px;
+    }
+    .return-box {
+      background: rgba(15, 23, 42, 0.95);
+      border: 2px solid #00F0FF;
+      border-radius: 16px;
+      padding: 32px;
+      max-width: 520px;
+      box-shadow: 0 0 30px rgba(0, 240, 255, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <div class="nav-left">
+      <button class="btn-return-game" onclick="returnToGodot()">
+        ◀ RETURN TO GODOT GAME
+      </button>
+      <div class="brand-title">
+        <span class="pulse-dot"></span>
+        <span>TERRALENS // RADAR LAB</span>
+      </div>
+      <span class="meta-tag">SENTINEL-1A SAR (C-BAND)</span>
+    </div>
+
+    <div class="nav-right">
+      <div class="xp-pill" id="score-display">★ 0 XP</div>
+      <div class="meta-tag">👤 Investigator-Mufliha</div>
+    </div>
+  </header>
+
+  <!-- Workspace: Full Single Satellite Map + Challenges Sidebar -->
+  <div class="workspace">
+    <!-- Map Stage (Exact Match to RadarMap.tsx) -->
+    <div class="map-stage">
+      <div class="map-top-bar">
+        <div class="coord-label">
+          <span>🧭</span>
+          <span>COORDINATES: 24.50° N, 89.70° E (Jamuna River, Bangladesh)</span>
+        </div>
+
+        <div class="layer-controls">
+          <button class="layer-btn active-flood" id="btn-flood-layer" onclick="toggleFloodLayer()">
+            <span>🌊</span>
+            <span id="btn-flood-text">Hide Water Mask</span>
+          </button>
+          <button class="layer-btn active-impact" id="btn-impact-layer" onclick="toggleImpactLayer()">
+            <span>👥</span>
+            <span id="btn-impact-text">Hide Communities</span>
+          </button>
+          <div class="est-pill" id="est-area-pill">
+            Estimated Inundation: ~12.5 km²
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Map Container -->
+      <div class="map-wrapper">
+        <div id="map-container"></div>
+        <div class="attribution-chip">SENTINEL-1 FLOOD MASK • NASA EARTHDATA</div>
+        
+        <!-- SAR Legend (Identical to localhost RadarMap.tsx) -->
+        <div class="sar-legend" id="sar-legend">
+          <div class="legend-title">SAR LEGEND</div>
+          <div class="legend-item" id="leg-flood">
+            <div class="swatch-flood"></div>
+            <span>Flood inundation zone (Sentinel-1)</span>
+          </div>
+          <div class="legend-item" id="leg-comm">
+            <div class="swatch-comm"></div>
+            <span>Affected community</span>
+          </div>
+          <div class="legend-item">
+            <div class="swatch-sat"></div>
+            <span>ArcGIS World Imagery basemap</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Earth's Timeline Bar (Identical to localhost) -->
+      <div class="timeline-bar">
+        <div class="timeline-title">
+          <span>⏱</span>
+          <span>EARTH'S TIMELINE</span>
+        </div>
+
+        <div class="timeline-buttons">
+          <button class="timeline-btn" onclick="selectTimeline(0)" id="tbtn-0">
+            <div class="t-date">📅 2024-05-15</div>
+            <div class="t-label">Pre-Monsoon Baseline</div>
+          </button>
+          <button class="timeline-btn" onclick="selectTimeline(1)" id="tbtn-1">
+            <div class="t-date">📅 2024-06-17</div>
+            <div class="t-label">Early Monsoon Swelling</div>
+          </button>
+          <button class="timeline-btn active" onclick="selectTimeline(2)" id="tbtn-2">
+            <div class="t-date">📅 2024-07-12</div>
+            <div class="t-label">Peak Inundation Phase</div>
+          </button>
+          <button class="timeline-btn" onclick="selectTimeline(3)" id="tbtn-3">
+            <div class="t-date">📅 2024-08-28</div>
+            <div class="t-label">Monsoon Recession</div>
+          </button>
+        </div>
+
+        <div class="timeline-status">
+          <div style="color: #00F0FF; font-weight: 600;" id="t-status">Widespread floodplain submersion</div>
+          <div id="t-extent">Extent: <strong>12.5 km²</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Science Intel & Field Challenges Sidebar -->
+    <aside>
+      <div class="aside-header">
+        <div class="section-tag">MISSION 001 // ORBITAL DIRECTIVE</div>
+        <div class="mission-title">The Changing Jamuna River</div>
+        <p class="mission-story">
+          Sentinel-1 C-band SAR captured this braided river system before and during peak monsoon. Your task: identify the inundation extent using radar backscatter signatures.
+        </p>
+      </div>
+
+      <!-- Radar Telemetry Specs -->
+      <div class="spec-card">
+        <div class="spec-row">
+          <span class="spec-label">SATELLITE SENSOR</span>
+          <span class="spec-val highlight">Sentinel-1A SAR (C-band)</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">MICROWAVE FREQ</span>
+          <span class="spec-val">5.405 GHz (5.6 cm)</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">POLARISATION</span>
+          <span class="spec-val">Dual-Pol (VV + VH)</span>
+        </div>
+        <div class="spec-row">
+          <span class="spec-label">SPATIAL RESOLUTION</span>
+          <span class="spec-val">10m / Pixel (L1 GRD)</span>
+        </div>
+      </div>
+
+      <!-- Field Challenge Card -->
+      <div class="challenge-card" id="challenge-container">
+        <div class="question-head">
+          <span style="color: #00F0FF; font-weight: bold;" id="q-counter">FIELD CHALLENGE 1 OF 3</span>
+          <span style="color: #fbbf24; font-weight: bold;">+50 XP</span>
+        </div>
+
+        <div class="question-text" id="q-text">
+          Loading challenge...
+        </div>
+
+        <div class="options-list" id="q-options">
+          <!-- Dynamic Buttons -->
+        </div>
+
+        <div class="explanation-box" id="q-explanation" style="display: none;">
+          <!-- Scientific explanation -->
+        </div>
+
+        <button class="btn-action" id="btn-next" style="display: none;" onclick="advanceQuestion()">
+          NEXT CHALLENGE ➔
+        </button>
+      </div>
+
+      <!-- Completion Banner -->
+      <div class="completion-banner" id="completion-box" style="display: none;">
+        <div style="font-size: 32px;">🏆</div>
+        <div class="completion-title">MISSION 001 ACCOMPLISHED!</div>
+        <p style="font-size: 12px; color: #cbd5e1; line-height: 1.5;">
+          You successfully penetrated storm clouds, mapped 12.5 km² of inundated floodwater, and evaluated community vulnerability along the Jamuna River!
+        </p>
+        <div style="font-family: monospace; font-size: 13px; font-weight: 700; color: #fbbf24;">
+          TOTAL REWARD: +150 XP AWARDED
+        </div>
+        <button class="btn-action" onclick="returnToGodot()">
+          🎮 RETURN TO GODOT (MISSION 002 UNLOCKED) ➔
+        </button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Return to Godot Screen Overlay -->
+  <div id="return-overlay">
+    <div class="return-box">
+      <div style="font-size: 36px;">🛰️</div>
+      <h2 style="font-size: 18px; color: #00F0FF; margin: 0;">Switch Back to Your Godot Game Window</h2>
+      <p style="font-size: 13px; color: #cbd5e1; line-height: 1.6; margin: 0;">
+        Your analysis results and <strong>+150 XP</strong> have been registered!<br />
+        Simply switch back to the <strong>Godot app</strong> on your Mac (press <strong>Cmd + Tab</strong> or click the Godot icon in your Dock) to continue with <strong>Mission 002 (Brahmaputra Flood Surge)</strong>.
+      </p>
+      <button class="btn-action" style="width: 100%; margin-top: 8px;" onclick="closeTab()">
+        Close This Tab Now
+      </button>
+    </div>
+  </div>
+
+  <script>
+    // Exact Coordinates & Data from mission01.ts & RadarMap.tsx
+    const coordinates = [89.70, 24.50];
+    const zoom = 10;
+
+    const FLOOD_POLYGON = [
+      [89.62, 24.58],
+      [89.75, 24.56],
+      [89.81, 24.48],
+      [89.78, 24.38],
+      [89.65, 24.40],
+      [89.58, 24.49],
+      [89.62, 24.58]
+    ];
+
+    const IMPACT_POINTS = [
+      { coords: [89.68, 24.52], name: 'Sirajganj Upazila', affected: 12400 },
+      { coords: [89.72, 24.44], name: 'Shahjadpur', affected: 8200 },
+      { coords: [89.63, 24.47], name: 'Belkuchi', affected: 5600 }
+    ];
+
+    const timelineData = [
+      { date: '2024-05-15', label: 'Pre-Monsoon Baseline', areaKm2: 0.0, status: 'Dry riverbed conditions', opacity: 0.0 },
+      { date: '2024-06-17', label: 'Early Monsoon Swelling', areaKm2: 4.2, status: 'Rising river volume detected', opacity: 0.20 },
+      { date: '2024-07-12', label: 'Peak Inundation Phase', areaKm2: 12.5, status: 'Widespread floodplain submersion', opacity: 0.38 },
+      { date: '2024-08-28', label: 'Monsoon Recession', areaKm2: 7.8, status: 'Water receding into primary channels', opacity: 0.22 }
+    ];
+
+    let currentTimelineIdx = 2;
+    let showFlood = true;
+    let showImpact = true;
+
+    // Single Full-Screen MapLibre Map (Matching React App exactly)
+    const map = new maplibregl.Map({
+      container: 'map-container',
+      style: {
+        version: 8,
+        sources: {
+          'arcgis-imagery': {
+            type: 'raster',
+            tiles: [
+              'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+            ],
+            tileSize: 256,
+            maxzoom: 19,
+            attribution: '© Esri, Maxar, GeoEye, USDA, USGS'
+          },
+          'arcgis-labels': {
+            type: 'raster',
+            tiles: [
+              'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}'
+            ],
+            tileSize: 256
+          }
+        },
+        layers: [
+          { id: 'imagery', type: 'raster', source: 'arcgis-imagery' },
+          { id: 'labels', type: 'raster', source: 'arcgis-labels' }
+        ]
+      },
+      center: coordinates,
+      zoom: zoom
+    });
+
+    map.addControl(new maplibregl.NavigationControl(), 'top-right');
+
+    map.on('load', () => {
+      // Sentinel-1 Flood Inundation Polygon
+      map.addSource('flood-zone', {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'Polygon', coordinates: [FLOOD_POLYGON] }
+        }
+      });
+
+      map.addLayer({
+        id: 'flood-fill',
+        type: 'fill',
+        source: 'flood-zone',
+        paint: {
+          'fill-color': '#00F0FF',
+          'fill-opacity': 0.38
+        }
+      });
+
+      map.addLayer({
+        id: 'flood-outline',
+        type: 'line',
+        source: 'flood-zone',
+        paint: {
+          'line-color': '#00F0FF',
+          'line-width': 2,
+          'line-opacity': 0.9
+        }
+      });
+
+      // Community Impact Points (Exact match: Orange circles with white stroke)
+      IMPACT_POINTS.forEach(pt => {
+        map.addSource(`impact-${pt.name}`, {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: { name: pt.name, affected: pt.affected },
+            geometry: { type: 'Point', coordinates: pt.coords }
+          }
+        });
+
+        map.addLayer({
+          id: `impact-circle-${pt.name}`,
+          type: 'circle',
+          source: `impact-${pt.name}`,
+          paint: {
+            'circle-radius': 10,
+            'circle-color': '#f97316',
+            'circle-opacity': 0.85,
+            'circle-stroke-color': '#fff',
+            'circle-stroke-width': 2
+          }
+        });
+
+        // Click popup on community marker
+        map.on('click', `impact-circle-${pt.name}`, (e) => {
+          new maplibregl.Popup({ offset: 12 })
+            .setLngLat(pt.coords)
+            .setHTML(`
+              <div style="color: #060913; font-size: 12px; font-weight: bold;">
+                ${pt.name}
+              </div>
+              <div style="color: #ea580c; font-size: 11px; margin-top: 3px;">
+                ⚠ Vulnerable Population: ${pt.affected.toLocaleString()} residents
+              </div>
+            `)
+            .addTo(map);
+        });
+
+        map.on('mouseenter', `impact-circle-${pt.name}`, () => {
+          map.getCanvas().style.cursor = 'pointer';
+        });
+        map.on('mouseleave', `impact-circle-${pt.name}`, () => {
+          map.getCanvas().style.cursor = '';
+        });
+      });
+    });
+
+    // Layer Toggle Functions
+    function toggleFloodLayer() {
+      showFlood = !showFlood;
+      const targetOpacity = showFlood ? timelineData[currentTimelineIdx].opacity : 0;
+      if (map.getLayer('flood-fill')) {
+        map.setPaintProperty('flood-fill', 'fill-opacity', targetOpacity);
+        map.setPaintProperty('flood-outline', 'line-opacity', showFlood ? 0.9 : 0);
+      }
+      document.getElementById('btn-flood-layer').classList.toggle('active-flood', showFlood);
+      document.getElementById('btn-flood-text').textContent = showFlood ? 'Hide Water Mask' : 'Show Water Mask';
+      document.getElementById('leg-flood').style.display = showFlood ? 'flex' : 'none';
+    }
+
+    function toggleImpactLayer() {
+      showImpact = !showImpact;
+      IMPACT_POINTS.forEach(pt => {
+        const id = `impact-circle-${pt.name}`;
+        if (map.getLayer(id)) {
+          map.setPaintProperty(id, 'circle-opacity', showImpact ? 0.85 : 0);
+          map.setPaintProperty(id, 'circle-stroke-width', showImpact ? 2 : 0);
+        }
+      });
+      document.getElementById('btn-impact-layer').classList.toggle('active-impact', showImpact);
+      document.getElementById('btn-impact-text').textContent = showImpact ? 'Hide Communities' : 'Show Communities';
+      document.getElementById('leg-comm').style.display = showImpact ? 'flex' : 'none';
+    }
+
+    // Timeline Selector
+    function selectTimeline(idx) {
+      currentTimelineIdx = idx;
+      const t = timelineData[idx];
+
+      for (let i = 0; i < 4; i++) {
+        document.getElementById(`tbtn-${i}`).classList.toggle('active', i === idx);
+      }
+
+      document.getElementById('t-status').textContent = t.status;
+      document.getElementById('t-extent').innerHTML = `Extent: <strong>${t.areaKm2} km²</strong>`;
+      document.getElementById('est-area-pill').textContent = `Estimated Inundation: ~${t.areaKm2} km²`;
+
+      if (showFlood && map.getLayer('flood-fill')) {
+        map.setPaintProperty('flood-fill', 'fill-opacity', t.opacity);
+        map.setPaintProperty('flood-outline', 'line-opacity', t.opacity > 0 ? 0.9 : 0);
+      }
+    }
+
+    // ---- 3 Field Challenges (from mission01.ts) ----
+    const challenges = [
+      {
+        question: "Open calm floodwater appears as deep black in Sentinel-1 SAR imagery because:",
+        options: [
+          "Water absorbs all microwave radiation permanently",
+          "Specular reflection bounces the radar pulse away from the sensor",
+          "The sensor cannot operate over liquid water surfaces",
+          "Dense monsoon cloud cover blocks the C-band signal"
+        ],
+        correct: 1,
+        explanation: "<strong>Specular Reflection:</strong> Calm water surfaces act like optical mirrors. The radar pulse bounces away at the same angle it arrived, returning zero backscatter (< -16 dB), displayed as black."
+      },
+      {
+        question: "Which Sentinel-1 polarisation channel is most sensitive to flood water beneath vegetation?",
+        options: [
+          "HH (horizontal transmit / horizontal receive)",
+          "VV (vertical transmit / vertical receive)",
+          "VH (vertical transmit / horizontal receive)",
+          "HV (horizontal transmit / vertical receive)"
+        ],
+        correct: 2,
+        explanation: "<strong>VH Cross-Polarisation:</strong> VH cross-polarisation captures volumetric scattering that penetrates into vegetation canopy, revealing double-bounce between water surface and stems."
+      },
+      {
+        question: "Bright white/yellow patches in the urban settlements along the Jamuna indicate:",
+        options: [
+          "Exposed sandbars from the receding river",
+          "Double-bounce radar return from flooded building walls",
+          "Storm clouds misidentified by the SAR processor",
+          "Agricultural fields with residual standing water"
+        ],
+        correct: 1,
+        explanation: "<strong>Corner Reflection (Double-Bounce):</strong> The radar pulse bounces off flat water, hits vertical masonry walls, and reflects straight back into the satellite antenna with high energy."
+      }
+    ];
+
+    let currentQ = 0;
+    let earnedXP = 0;
+
+    function renderQuestion() {
+      const q = challenges[currentQ];
+      document.getElementById('q-counter').textContent = `FIELD CHALLENGE ${currentQ + 1} OF ${challenges.length}`;
+      document.getElementById('q-text').textContent = q.question;
+
+      const optContainer = document.getElementById('q-options');
+      optContainer.innerHTML = '';
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option-btn';
+        btn.textContent = `${String.fromCharCode(65 + idx)}) ${opt}`;
+        btn.onclick = () => selectAnswer(idx);
+        optContainer.appendChild(btn);
+      });
+
+      document.getElementById('q-explanation').style.display = 'none';
+      document.getElementById('btn-next').style.display = 'none';
+    }
+
+    function selectAnswer(chosenIdx) {
+      const q = challenges[currentQ];
+      const buttons = document.querySelectorAll('.option-btn');
+      buttons.forEach(b => b.disabled = true);
+
+      if (chosenIdx === q.correct) {
+        buttons[chosenIdx].classList.add('correct');
+        earnedXP += 50;
+        document.getElementById('score-display').textContent = `★ ${earnedXP} XP`;
+      } else {
+        buttons[chosenIdx].classList.add('wrong');
+        buttons[q.correct].classList.add('correct');
+      }
+
+      const expBox = document.getElementById('q-explanation');
+      expBox.innerHTML = q.explanation;
+      expBox.style.display = 'block';
+
+      if (currentQ < challenges.length - 1) {
+        document.getElementById('btn-next').style.display = 'block';
+      } else {
+        setTimeout(() => {
+          document.getElementById('challenge-container').style.display = 'none';
+          document.getElementById('completion-box').style.display = 'flex';
+        }, 1200);
+      }
+    }
+
+    function advanceQuestion() {
+      currentQ++;
+      renderQuestion();
+    }
+
+    // ---- Return to Godot Game Mechanics ----
+    function returnToGodot() {
+      // 1. Try to close the browser tab to bring Godot back to focus
+      window.close();
+
+      // 2. If browser blocks window.close() (standard security for user-opened tabs), show overlay instructions
+      document.getElementById('return-overlay').style.display = 'flex';
+    }
+
+    function closeTab() {
+      window.close();
+      window.history.back();
+    }
+
+    renderQuestion();
+  </script>
+</body>
+</html>

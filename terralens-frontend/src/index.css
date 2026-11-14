@@ -1,0 +1,545 @@
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&family=Press+Start+2P&family=Space+Grotesk:wght@500;700&display=swap');
+
+@font-face {
+  font-family: 'Bagel Fat One';
+  src: url('/fonts/BagelFatOne-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Lilita One';
+  src: url('/fonts/LilitaOne-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* NASA Radar Design Tokens */
+  --bg-dark-navy: #060913;
+  --bg-card: rgba(11, 17, 32, 0.95);
+  --electric-blue: #0284c7;
+  --cyan: #00F0FF;
+  --green-land: #10b981;
+  --orange-change: #f97316;
+  --text-white: #ffffff;
+  --text-muted: #94a3b8;
+  --border-subtle: rgba(51, 65, 85, 0.6);
+  --border-cyan: rgba(0, 240, 255, 0.4);
+
+  --cosmic-bg: #0B0D26;
+  --wave-cyan: #00F2FE;
+  --wave-blue: #4FACFE;
+  --retro-coral: #FF4365;
+  --nebula-purple: #9D4EDD;
+  --solar-gold: #FFD166;
+}
+
+body {
+  margin: 0;
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+  overflow-x: hidden;
+  background-color: #080A1E;
+  color: #F1F5F9;
+}
+
+/* Retro Pixel Font Utility */
+.font-pixel {
+  font-family: 'Press Start 2P', monospace;
+}
+
+.font-hud {
+  font-family: 'Chakra Petch', sans-serif;
+}
+
+/* Custom glow and radar sweep styles */
+.radar-glow {
+  box-shadow: 0 0 25px rgba(0, 242, 254, 0.35);
+}
+
+.coral-glow {
+  box-shadow: 0 0 25px rgba(255, 67, 101, 0.4);
+}
+
+.gold-glow {
+  box-shadow: 0 0 25px rgba(255, 209, 102, 0.4);
+}
+
+/* 8-bit / Arcade Pixel Border Box */
+.pixel-box {
+  position: relative;
+  border: 3px solid #00F2FE;
+  box-shadow: 
+    0 0 0 2px #0B0D26,
+    0 0 20px rgba(0, 242, 254, 0.3),
+    inset 0 0 20px rgba(79, 172, 254, 0.15);
+}
+
+.pixel-box-coral {
+  position: relative;
+  border: 3px solid #FF4365;
+  box-shadow: 
+    0 0 0 2px #0B0D26,
+    0 0 20px rgba(255, 67, 101, 0.35),
+    inset 0 0 20px rgba(255, 67, 101, 0.15);
+}
+
+/* CRT Scanline & Starfield animations */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.star-twinkle {
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+@keyframes float-cloud {
+  0% { transform: translateX(-5%); }
+  50% { transform: translateX(5%); }
+  100% { transform: translateX(-5%); }
+}
+
+.animate-float-slow {
+  animation: float-cloud 18s ease-in-out infinite;
+}
+
+@keyframes wave-pulse {
+  0%, 100% { transform: translateY(0px) scaleY(1); }
+  50% { transform: translateY(-8px) scaleY(1.02); }
+}
+
+.animate-wave {
+  animation: wave-pulse 8s ease-in-out infinite;
+}
+
+/* ── App header ─────────────────────────────────────────────────────────── */
+.tl-header {
+  position: relative;
+  z-index: 50;
+  flex-shrink: 0;
+  height: 64px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: linear-gradient(180deg, rgba(8, 22, 54, 0.92), rgba(5, 14, 38, 0.88));
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+  font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+}
+/* glowing hairline under the bar */
+.tl-header::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.75) 18%, rgba(157, 78, 221, 0.6) 62%, transparent);
+}
+.tl-header-left  { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.tl-header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+/* Brand */
+.tl-brand { display: flex; align-items: center; gap: 10px; cursor: pointer; flex-shrink: 0; }
+.tl-brand-mark { position: relative; width: 22px; height: 22px; display: grid; place-items: center; }
+.tl-brand-core {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #d9fdff, #00F0FF 60%);
+  box-shadow: 0 0 12px #00F0FF;
+}
+.tl-brand-ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 1.5px solid rgba(0, 240, 255, 0.7);
+  animation: tl-ping 2.2s ease-out infinite;
+}
+@keyframes tl-ping {
+  0%   { transform: scale(0.45); opacity: 0.9; }
+  80%  { transform: scale(1.15); opacity: 0; }
+  100% { transform: scale(1.15); opacity: 0; }
+}
+.tl-brand-name {
+  font-family: 'Bagel Fat One', cursive, sans-serif;
+  font-size: 23px;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  color: #FDF5CC;
+  text-shadow: 0 2px 0 #05102E, 0 0 14px rgba(0, 240, 255, 0.55);
+  transition: text-shadow 0.2s ease;
+}
+.tl-brand:hover .tl-brand-name { text-shadow: 0 2px 0 #05102E, 0 0 20px rgba(0, 240, 255, 0.9); }
+
+/* Navigation: one pill-shaped track, active tab glows */
+.tl-nav {
+  display: flex; gap: 4px; padding: 4px; flex-shrink: 0;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(115, 217, 255, 0.16);
+  box-shadow: inset 0 1px 6px rgba(0, 0, 0, 0.35);
+}
+.tl-nav-btn {
+  position: relative;
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 13px;
+  border: none; border-radius: 999px;
+  background: transparent;
+  color: #9fb3cc;
+  font: 600 12.5px/1 'Space Grotesk', system-ui, sans-serif;
+  white-space: nowrap; flex-shrink: 0;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, transform 0.12s ease;
+}
+.tl-nav-btn:hover { color: #e6f9ff; background: rgba(0, 240, 255, 0.1); }
+.tl-nav-btn:active { transform: scale(0.97); }
+.tl-nav-btn:focus-visible, .tl-icon-btn:focus-visible { outline: 2px solid #7df9ff; outline-offset: 2px; }
+.tl-nav-btn.is-active {
+  color: #04121f;
+  background: linear-gradient(135deg, #8dfaff, #00d8f5);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+.tl-nav-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #FF4365; box-shadow: 0 0 8px #FF4365;
+}
+
+/* Player card */
+.tl-player {
+  display: flex; align-items: center; gap: 9px;
+  height: 44px; padding: 0 14px 0 5px; box-sizing: border-box;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(115, 217, 255, 0.22);
+  min-width: 0;
+}
+.tl-avatar {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  display: grid; place-items: center;
+  background: linear-gradient(135deg, #00F0FF, #9D4EDD);
+  color: #04121f; font-weight: 800; font-size: 14px;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.35);
+}
+.tl-player-text { display: flex; flex-direction: column; min-width: 0; }
+.tl-player-name {
+  max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: 12.5px; font-weight: 700; line-height: 1.15; color: #f1f5f9;
+}
+.tl-player-rank {
+  font: 600 9.5px/1.3 'Chakra Petch', monospace;
+  letter-spacing: 0.9px; text-transform: uppercase; white-space: nowrap;
+  color: #73D9FF;
+}
+.tl-xpbar { display: block; height: 3px; margin-top: 3px; border-radius: 2px; background: rgba(148, 163, 184, 0.25); overflow: hidden; }
+.tl-xpbar > span { display: block; height: 100%; border-radius: 2px; background: linear-gradient(90deg, #FFD166, #ff9f43); transition: width 0.4s ease; }
+
+/* XP / coin pills and the sound button share one height and shape */
+.tl-stat {
+  display: flex; align-items: center; gap: 6px;
+  height: 36px; padding: 0 13px; box-sizing: border-box;
+  border-radius: 999px;
+  font: 700 13px/1 'Chakra Petch', monospace;
+  letter-spacing: 0.3px; white-space: nowrap;
+}
+.tl-stat--xp   { color: #FFD166; background: rgba(255, 209, 102, 0.1); border: 1px solid rgba(255, 209, 102, 0.4); }
+.tl-stat--coin { color: #7df9ff; background: rgba(0, 240, 255, 0.08); border: 1px solid rgba(0, 240, 255, 0.35); }
+.tl-icon-btn {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  display: grid; place-items: center;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(115, 217, 255, 0.22);
+  color: #7df9ff; cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+.tl-icon-btn:hover { background: rgba(0, 240, 255, 0.14); border-color: rgba(0, 240, 255, 0.6); }
+.tl-icon-btn.is-muted { color: #64748b; }
+
+/* ── Radar Lab layout helpers ───────────────────────────────────────────── */
+.tl-hud button,
+.tl-hud span,
+.tl-ticker span { white-space: nowrap; flex-shrink: 0; }
+
+/* Slim scrollbars inside the lab panels */
+.tl-lab-col, .tl-lab-col ~ aside { scrollbar-width: thin; scrollbar-color: rgba(0, 240, 255, 0.35) transparent; }
+
+/* Narrower windows: tighten, then drop secondary bits, instead of squeezing text */
+@media (max-width: 1320px) {
+  .tl-timeline-status { display: none; }
+  .tl-header-left { gap: 12px; }
+  .tl-nav-btn { padding: 7px 10px; gap: 6px; }
+  .tl-player-name { max-width: 130px; }
+}
+@media (max-width: 1120px) {
+  .tl-player-text { display: none; }
+  .tl-player { padding: 0 5px; }
+}
+@media (max-width: 960px) {
+  .tl-nav-label { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tl-brand-ring { animation: none; opacity: 0.5; }
+}
+
+/* Change Detective: crosshair while the player is placing marks on the map */
+.tl-marking .maplibregl-canvas-container.maplibregl-interactive { cursor: crosshair !important; }
+
+/* Mission cards: lift and glow on hover */
+
+/* ── Dashboard motion ─────────────────────────────────────────────────────── */
+.tl-mcard {
+  transition: transform 0.18s ease-out;
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  animation: tl-rise 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  will-change: transform;
+}
+.tl-mcard:nth-child(2) { animation-delay: 0.12s; }
+.tl-mcard:nth-child(3) { animation-delay: 0.24s; }
+.tl-mcard:hover { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)) translateY(-6px) scale(1.02); }
+@keyframes tl-rise { from { opacity: 0; transform: perspective(900px) translateY(40px) rotateX(14deg); } }
+
+/* Radar sweep turning around the avatar */
+.tl-sweep {
+  position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  background: conic-gradient(from 0deg, rgba(0, 240, 255, 0) 0deg, rgba(0, 240, 255, 0) 290deg, rgba(0, 240, 255, 0.55) 360deg);
+  animation: tl-spin 3.2s linear infinite;
+}
+@keyframes tl-spin { to { transform: rotate(360deg); } }
+
+/* Scan line travelling down each radar picture */
+.tl-scan { position: relative; overflow: hidden; }
+.tl-scan::after {
+  content: ''; position: absolute; left: 0; right: 0; top: 0; height: 46px; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 240, 255, 0), rgba(0, 240, 255, 0.28) 85%, rgba(0, 240, 255, 0.9));
+  animation: tl-scan 3.6s ease-in-out infinite;
+}
+@keyframes tl-scan { from { transform: translateY(-60px); } to { transform: translateY(200px); } }
+
+/* Launch button: breathing glow and a light streak */
+.tl-launch { position: relative; overflow: hidden; }
+.tl-launch::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 40%; left: -60%; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  animation: tl-streak 3s ease-in-out infinite;
+}
+@keyframes tl-glow { 0%, 100% { box-shadow: 0 0 12px rgba(0, 240, 255, 0.35); } 50% { box-shadow: 0 0 30px rgba(0, 240, 255, 0.85); } }
+@keyframes tl-streak { 0%, 55% { left: -60%; } 100% { left: 130%; } }
+
+/* XP bar shimmer */
+.tl-xpfill { background-size: 200% 100% !important; animation: tl-shimmer 2.4s ease-in-out infinite alternate; }
+@keyframes tl-shimmer { from { background-position: 0% 0; } to { background-position: 100% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .tl-mcard, .tl-sweep, .tl-scan::after, .tl-launch, .tl-launch::after, .tl-xpfill { animation: none !important; }
+  .tl-mcard, .tl-mcard:hover { transform: none; }
+}
+
+/* ── Fun extras ───────────────────────────────────────────────────────────── */
+.tl-confetti { position: absolute; top: -12px; border-radius: 1px; opacity: 0; animation: tl-confetti linear 1 forwards; }
+@keyframes tl-confetti {
+  0% { opacity: 1; top: -12px; margin-left: 0; }
+  100% { opacity: 0; top: 105%; margin-left: 40px; rotate: 720deg; }
+}
+.tl-fade { animation: tl-fadein 0.5s ease; }
+@keyframes tl-fadein { from { opacity: 0; transform: translateY(4px); } }
+.tl-pop { display: inline-block; animation: tl-pop 0.3s ease; }
+@keyframes tl-pop { 0% { transform: scale(1.7); } 100% { transform: scale(1); } }
+.tl-flame { animation: tl-flame 1.6s ease-in-out infinite; }
+@keyframes tl-flame { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+@media (prefers-reduced-motion: reduce) { .tl-confetti { display: none; } .tl-fade, .tl-pop, .tl-flame { animation: none; } }
+
+/* ── Game look for the dashboard (matches the welcome screen) ─────────────── */
+.tl-gtitle {
+  font-family: 'Bagel Fat One', cursive, sans-serif; font-size: 28px; font-weight: 400; letter-spacing: 1px;
+  color: #FDF5CC; text-shadow: 0 3px 0 #2563eb, 0 6px 14px rgba(37, 99, 235, 0.5);
+}
+.tl-gsub { font-family: 'Lilita One', sans-serif; font-size: 17px; font-weight: 400; letter-spacing: 1px; color: #FDF5CC; text-shadow: 0 2px 0 #2563eb; }
+.tl-spark { display: inline-block; color: #FFD166; font-size: 18px; animation: tl-twinkle 1.8s ease-in-out infinite; }
+@keyframes tl-twinkle { 0%, 100% { opacity: 0.35; transform: scale(0.7) rotate(0deg); } 50% { opacity: 1; transform: scale(1.2) rotate(20deg); } }
+.tl-mtitle { font-family: 'Lilita One', sans-serif !important; font-size: 23px !important; font-weight: 400 !important; letter-spacing: 0.8px !important; line-height: 1.1 !important; text-shadow: 0 3px 0 rgba(29, 78, 216, 0.9); }
+
+/* Chunky arcade button with a hard drop shadow that presses down */
+.tl-btn3d {
+  font-family: 'Lilita One', sans-serif !important; font-size: 17px !important; font-weight: 400 !important; letter-spacing: 1px !important;
+  border-radius: 28px !important; border: 3px solid #FFE68C !important; background: #FF9E25 !important; color: #0B0D26 !important;
+  box-shadow: 0 6px 0 #B34700, 0 12px 22px rgba(255, 158, 37, 0.45) !important;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+.tl-btn3d:hover { background: #FFB040 !important; transform: translateY(-2px); }
+.tl-btn3d:active { transform: translateY(4px); box-shadow: 0 2px 0 #B34700, 0 4px 10px rgba(255, 158, 37, 0.4) !important; }
+.tl-btn3d--locked, .tl-btn3d--locked:hover, .tl-btn3d--locked:active {
+  background: #1e293b !important; border-color: #334155 !important; color: #64748b !important;
+  box-shadow: 0 6px 0 #0b1220 !important; transform: none;
+}
+
+/* Level stickers on the mission cards */
+.tl-mcard { border-radius: 26px !important; }
+.tl-mcard:nth-child(1) { --lvl: 'LEVEL 1'; --lvlc: #FF4365; }
+.tl-mcard:nth-child(2) { --lvl: 'LEVEL 2'; --lvlc: #FF9E25; }
+.tl-mcard:nth-child(3) { --lvl: 'LEVEL 3'; --lvlc: #9D4EDD; }
+.tl-mcard::before {
+  content: var(--lvl); position: absolute; top: -14px; right: 18px; z-index: 3;
+  padding: 3px 12px; border-radius: 14px; background: var(--lvlc); color: #fff; border: 2px solid #FDF5CC;
+  font-family: 'Lilita One', sans-serif; font-size: 13px; letter-spacing: 1px;
+  transform: rotate(5deg); box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* Arcade cards: chunky coloured frame, lift on hover, tilted sticker */
+.tl-acard {
+  position: relative; padding: 20px; border-radius: 24px;
+  background: rgba(11, 17, 32, 0.82); border: 3px solid var(--ac, #00F0FF);
+  box-shadow: 0 7px 0 rgba(0, 0, 0, 0.45), 0 0 26px color-mix(in srgb, var(--ac, #00F0FF) 35%, transparent);
+  transition: transform 0.18s ease;
+  animation: tl-rise 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.tl-acard:hover { transform: translateY(-4px); }
+.tl-acard[data-tag]::before {
+  content: attr(data-tag); position: absolute; top: -14px; right: 18px; z-index: 3;
+  padding: 3px 12px; border-radius: 14px; background: var(--ac, #00F0FF); color: #0B0D26; border: 2px solid #FDF5CC;
+  font-family: 'Lilita One', sans-serif; font-size: 13px; letter-spacing: 1px;
+  transform: rotate(4deg); box-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+}
+@media (prefers-reduced-motion: reduce) { .tl-acard { animation: none; } .tl-spark { animation: none; } }
+
+/* Sticky notes for My Memories */
+.tl-note {
+  position: relative; padding: 16px 14px 14px; border-radius: 4px 4px 14px 4px;
+  display: flex; flex-direction: column; gap: 8px;
+  transform: rotate(var(--tilt, -1deg)); box-shadow: 0 8px 0 rgba(0, 0, 0, 0.35), 0 14px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.18s ease; animation: tl-rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.tl-note:hover { transform: rotate(0deg) translateY(-4px) scale(1.03); z-index: 2; }
+@media (prefers-reduced-motion: reduce) { .tl-note { animation: none; } }
+
+/* ── Game look for the Radar Lab ──────────────────────────────────────────── */
+.tl-labcard, .tl-labmap, .tl-labpanel {
+  border-radius: 20px !important; border: 3px solid #00F0FF !important;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.5), 0 0 22px rgba(0, 240, 255, 0.28) !important;
+}
+.tl-labmap { border-color: #FFD166 !important; box-shadow: 0 7px 0 rgba(0, 0, 0, 0.5), 0 0 28px rgba(255, 209, 102, 0.3) !important; }
+.tl-labpanel { border-color: #9D4EDD !important; box-shadow: 0 7px 0 rgba(0, 0, 0, 0.5), 0 0 28px rgba(157, 78, 221, 0.35) !important; }
+.tl-labpanel button:not(:disabled), .tl-labcard button:not(:disabled) { transition: transform 0.12s ease, filter 0.12s ease; }
+.tl-labpanel button:not(:disabled):hover { transform: translateY(-2px); filter: brightness(1.1); }
+.tl-labpanel button:not(:disabled):active { transform: translateY(2px); }
+.tl-labpanel button[style*="linear-gradient"] {
+  font-family: 'Lilita One', sans-serif !important; font-weight: 400 !important; letter-spacing: 1px; font-size: 15px !important;
+  border: 3px solid #FFE68C !important; border-radius: 22px !important; box-shadow: 0 5px 0 #B34700, 0 8px 16px rgba(255, 158, 37, 0.35);
+}
+.tl-labpanel button[style*="linear-gradient"]:active { box-shadow: 0 1px 0 #B34700; }
+.tl-labpanel strong { color: #FDF5CC; }
+.tl-labpanel > div > div { border-radius: 16px !important; }
+@media (prefers-reduced-motion: reduce) { .tl-labpanel button, .tl-labcard button { transition: none; } }
+
+/* ── Earth Explorer map pins: glowing, pulsing, mystery pins bounce ───────── */
+.tl-pin {
+  width: 22px; height: 22px; border-radius: 50%; cursor: pointer; padding: 0;
+  border: 3px solid #fff; background: var(--pc, #00F0FF); color: #060913; font: 400 14px/1 'Lilita One', sans-serif;
+  box-shadow: 0 0 12px var(--pc), 0 3px 0 rgba(0, 0, 0, 0.45);
+}
+.tl-pin::after {
+  content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--pc);
+  animation: tl-pinring 2s ease-out infinite; pointer-events: none;
+}
+.tl-pin--locked { font-size: 10px; } .tl-pin--locked::after { display: none; }
+.tl-pin--mystery { animation: tl-bob 1.4s ease-in-out infinite; }
+.tl-pin--sel { width: 30px; height: 30px; box-shadow: 0 0 22px var(--pc), 0 3px 0 rgba(0, 0, 0, 0.45); }
+@keyframes tl-pinring { 0% { transform: scale(0.7); opacity: 0.9; } 100% { transform: scale(2.1); opacity: 0; } }
+@keyframes tl-bob { 0%, 100% { margin-top: 0; } 50% { margin-top: -6px; } }
+@media (prefers-reduced-motion: reduce) { .tl-pin::after, .tl-pin--mystery { animation: none; } }
+
+/* ── Crisis Dispatch banner ───────────────────────────────────────────────── */
+.tl-crisis {
+  position: relative; display: flex; align-items: center; gap: 18px; padding: 12px 20px 12px 16px; overflow: hidden;
+  border-radius: 22px; border: 3px solid #FF4365;
+  background: linear-gradient(100deg, rgba(255, 67, 101, 0.28) 0%, rgba(11, 17, 32, 0.9) 45%, rgba(0, 240, 255, 0.16) 100%);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.5), 0 0 26px rgba(255, 67, 101, 0.35);
+}
+.tl-crisis::after {
+  content: ''; position: absolute; top: 0; bottom: 0; width: 90px; left: -120px; pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.18), transparent); transform: skewX(-20deg);
+  animation: tl-shine 5s ease-in-out infinite;
+}
+@keyframes tl-shine { 0%, 55% { left: -120px; } 100% { left: 110%; } }
+.tl-crisis__badge {
+  flex-shrink: 0; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; padding: 7px 16px; border-radius: 16px;
+  background: #FF4365; color: #fff; border: 3px solid #FDF5CC; transform: rotate(-3deg);
+  font-family: 'Lilita One', sans-serif; font-size: 16px; letter-spacing: 1.2px; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4);
+}
+.tl-crisis__dot { width: 10px; height: 10px; border-radius: 50%; background: #FDF5CC; animation: tl-blink 1.1s ease-in-out infinite; }
+@keyframes tl-blink { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.25; transform: scale(0.6); } }
+.tl-crisis__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.tl-crisis__title { font-family: 'Lilita One', sans-serif; font-size: 22px; letter-spacing: 0.8px; color: #FDF5CC; text-shadow: 0 2px 0 rgba(37, 99, 235, 0.9); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tl-crisis__sub { font-size: 12.5px; color: #cbd5e1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tl-crisis__chips { flex-shrink: 0; display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.tl-chip {
+  display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: 14px; white-space: nowrap;
+  background: color-mix(in srgb, var(--cc) 14%, rgba(11, 17, 32, 0.9)); border: 2px solid var(--cc); color: var(--cc);
+  font-family: 'Lilita One', sans-serif; font-size: 12.5px; letter-spacing: 0.8px;
+}
+@media (max-width: 1100px) { .tl-crisis { flex-wrap: wrap; } .tl-crisis__chips { justify-content: flex-start; } }
+@media (prefers-reduced-motion: reduce) { .tl-crisis::after, .tl-crisis__dot { animation: none; } }
+
+/* ── Game-style top bar (overrides the earlier header rules) ──────────────── */
+.tl-header {
+  height: 74px; padding: 0 22px; gap: 18px;
+  background: linear-gradient(180deg, rgba(14, 30, 78, 0.96), rgba(6, 12, 36, 0.94));
+  border-bottom: 4px solid #1d4ed8;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.4), 0 10px 30px rgba(37, 99, 235, 0.25);
+}
+.tl-header::after { height: 3px; bottom: -4px; background: linear-gradient(90deg, #FF4365, #FF9E25 25%, #FFD166 50%, #00F0FF 75%, #9D4EDD); opacity: 0.9; }
+.tl-brand-mark { width: 34px; height: 34px; }
+.tl-brand-core { width: 16px; height: 16px; border: 3px solid #FDF5CC; box-sizing: border-box; }
+.tl-brand-ring { border-width: 3px; }
+.tl-brand-name { font-size: 30px; text-shadow: 0 3px 0 #2563eb, 0 6px 14px rgba(37, 99, 235, 0.55); }
+.tl-brand:hover .tl-brand-name { text-shadow: 0 3px 0 #2563eb, 0 0 22px rgba(255, 209, 102, 0.9); }
+.tl-brand:hover .tl-brand-mark { transform: rotate(20deg) scale(1.1); } .tl-brand-mark { transition: transform .2s ease; }
+
+.tl-nav { gap: 8px; padding: 6px; border-radius: 30px; background: rgba(5, 10, 30, 0.7); border: 3px solid rgba(115, 217, 255, 0.28); box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4); }
+.tl-nav-btn {
+  padding: 9px 16px; gap: 8px; border-radius: 22px; color: #c7d7f0;
+  font: 400 16px/1 'Lilita One', sans-serif; letter-spacing: 0.8px;
+}
+.tl-nav-btn:hover { color: #FDF5CC; background: rgba(255, 209, 102, 0.12); transform: translateY(-2px); }
+.tl-nav-btn:active { transform: translateY(2px) scale(0.98); }
+.tl-nav-btn.is-active {
+  color: #0B0D26; background: #FF9E25; border: 0; transform: translateY(-1px);
+  box-shadow: 0 4px 0 #B34700, 0 0 18px rgba(255, 158, 37, 0.55), inset 0 2px 0 rgba(255, 255, 255, 0.45);
+}
+.tl-nav-btn.is-active:hover { background: #FFB040; color: #0B0D26; }
+
+.tl-player { height: 52px; padding: 0 18px 0 6px; border-radius: 30px; background: rgba(5, 10, 30, 0.7); border: 3px solid #9D4EDD; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4), 0 0 16px rgba(157, 78, 221, 0.3); }
+.tl-avatar { width: 38px; height: 38px; font: 400 20px/1 'Lilita One', sans-serif; border: 3px solid #FDF5CC; box-sizing: border-box; }
+.tl-player-name { font: 400 15px/1.1 'Lilita One', sans-serif; letter-spacing: 0.6px; color: #FDF5CC; }
+.tl-player-rank { font: 400 11px/1.3 'Lilita One', sans-serif; letter-spacing: 1px; color: #73D9FF; }
+.tl-xpbar { height: 6px; border-radius: 4px; background: rgba(148, 163, 184, 0.3); border: 1px solid rgba(0, 0, 0, 0.4); }
+.tl-xpbar > span { border-radius: 4px; background: linear-gradient(90deg, #FFD166, #FF9E25); box-shadow: 0 0 8px rgba(255, 158, 37, 0.7); }
+
+.tl-stat { height: 44px; padding: 0 16px; gap: 8px; font: 400 18px/1 'Lilita One', sans-serif; letter-spacing: 0.8px; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4); }
+.tl-stat--xp { color: #FFD166; background: rgba(255, 209, 102, 0.14); border: 3px solid #FFD166; }
+.tl-stat--coin { color: #7df9ff; background: rgba(0, 240, 255, 0.1); border: 3px solid #00F0FF; }
+.tl-stat svg { filter: drop-shadow(0 0 5px currentColor); }
+.tl-icon-btn { width: 44px; height: 44px; border: 3px solid #475569; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4); }
+.tl-icon-btn:hover { border-color: #FFD166; color: #FFD166; transform: translateY(-2px); }
+.tl-icon-btn:active { transform: translateY(2px); }
+
+@media (max-width: 1320px) {
+  .tl-brand-name { font-size: 26px; } .tl-nav-btn { padding: 8px 12px; font-size: 15px; } .tl-player-name { max-width: 110px; }
+}
+@media (max-width: 1120px) { .tl-header { padding: 0 12px; gap: 10px; } .tl-brand-name { display: none; } .tl-stat { padding: 0 12px; } }
+@media (max-width: 960px) { .tl-nav-btn { padding: 9px 12px; } }
+
+/* Header avatar sits inside the round frame */
+.tl-avatar { overflow: hidden; }
+
+/* Keep the top bar from crowding on 13–15 inch laptops */
+@media (max-width: 1560px) {
+  .tl-header { padding: 0 14px; gap: 10px; }
+  .tl-header-left { gap: 12px; }
+  .tl-brand-name { font-size: 24px; }
+  .tl-nav { gap: 4px; padding: 5px; }
+  .tl-nav-btn { padding: 8px 12px; font-size: 14.5px; gap: 6px; }
+  .tl-player-name { max-width: 100px; font-size: 14px; }
+  .tl-stat { padding: 0 12px; font-size: 16px; }
+}
+@media (max-width: 1360px) { .tl-player-text { display: none; } .tl-player { padding: 0 6px; } }
